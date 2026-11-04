@@ -117,6 +117,6 @@ ejemplos/             cuestionarios de ejemplo
 
 ## Licencia
 
-Copyright © 2026 Mario Gustavo Iturriz.
+Copyleft 🄯 2026 Gustavo Iturriz — Ushuaia, Tierra del Fuego, Argentina.
 
-Este programa es software libre: se puede redistribuir y modificar según los términos de la Licencia Pública General GNU (GPL) publicada por la Free Software Foundation, versión 3 o posterior. Las obras derivadas tienen que mantener la misma licencia. Texto completo en `LICENSE`. Las piezas de terceros y sus licencias están detalladas en `LICENCIAS-TERCEROS.md`.
+Software libre bajo la **GNU GPL versión 3** o posterior: se puede usar, copiar, estudiar, cambiar y repartir sin pedir permiso, siempre que lo que se reparta siga siendo libre, con la misma licencia y con la mención de autoría. Ver `LICENCIA.md` (en criollo), `LICENSE` (texto completo) y `LICENCIAS-TERCEROS.md` (bibliotecas incluidas). Dentro de la aplicación, todo esto está en **Acerca de**.

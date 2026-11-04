@@ -1,5 +1,5 @@
 /* Aula en Vivo — vista del docente (lo que se proyecta)
-   Copyright (C) 2026 Mario Gustavo Iturriz — Licencia GPL-3.0-o-posterior
+   Copyleft 🄯 2026 Gustavo Iturriz — Licencia GNU GPL v3 o posterior
 
    El navegador del docente es "el que manda": guarda los puntajes, lleva el tiempo
    y le avisa a cada celular qué tiene que mostrar. Nada se guarda en servidores. */

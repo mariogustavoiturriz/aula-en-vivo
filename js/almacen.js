@@ -1,5 +1,5 @@
 /* Aula en Vivo — cuestionarios guardados en este navegador
-   Copyright (C) 2026 Mario Gustavo Iturriz — Licencia GPL-3.0-o-posterior */
+   Copyleft 🄯 2026 Gustavo Iturriz — Licencia GNU GPL v3 o posterior */
 'use strict';
 
 (function (AV) {

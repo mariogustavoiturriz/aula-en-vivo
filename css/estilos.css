@@ -304,6 +304,17 @@ details.avanzado summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
 #aviso { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 100; pointer-events: none; }
 #aviso .toast { background: var(--tinta); color: #fff; padding: 12px 18px; border-radius: var(--radio-chico); font-weight: 700; box-shadow: var(--sombra-papel); animation: aparecer .2s ease-out; }
 
+/* ---------- Acerca de ---------- */
+.copyleft { display: inline-block; transform: scaleX(-1); line-height: 1; }
+.copyleft-grande { font-size: 3rem; }
+.ficha { display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; align-items: baseline; margin: 0; }
+.ficha dt { font-weight: 700; color: var(--tinta-suave); font-size: .92rem; }
+.ficha dd { margin: 0; }
+.creditos { padding-left: 1.2em; margin: 0 0 1em; }
+.creditos li { margin-bottom: 6px; }
+.pie { margin-top: 32px; color: var(--tinta-suave); font-size: .92rem; }
+.pie a { color: inherit; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 760px) {
   .sala { grid-template-columns: 1fr; }

@@ -6,7 +6,7 @@
    Uso:   npm install   y después   npm start
    Puerto: variable PUERTO (por defecto 8787). Detrás de HTTPS, publicarlo como wss://
 
-   Copyright (C) 2026 Mario Gustavo Iturriz — Licencia GPL-3.0-o-posterior */
+   Copyleft 🄯 2026 Gustavo Iturriz — Licencia GNU GPL v3 o posterior */
 import { createWsRelayServer } from '@trystero-p2p/ws-relay/server'
 
 const port = Number(process.env.PUERTO || 8787)

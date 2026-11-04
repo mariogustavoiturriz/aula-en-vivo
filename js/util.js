@@ -1,5 +1,5 @@
 /* Aula en Vivo — utilidades compartidas
-   Copyright (C) 2026 Mario Gustavo Iturriz — Licencia GPL-3.0-o-posterior */
+   Copyleft 🄯 2026 Gustavo Iturriz — Licencia GNU GPL v3 o posterior */
 'use strict';
 
 window.AV = window.AV || {};
@@ -100,12 +100,20 @@ window.AV = window.AV || {};
     }
   };
 
+  const VERSION = '1.1';
+
   function encabezado(extra) {
     return h('header', { class: 'encabezado' },
       h('a', { class: 'marca', href: '#/' },
         h('span', { class: 'marca-icono', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'), h('i')),
         'Aula en Vivo'),
-      extra || null);
+      extra || h('nav', { class: 'fila' },
+        h('a', { class: 'boton boton-texto', href: '#/acerca', 'aria-current': location.hash === '#/acerca' ? 'page' : null }, 'Acerca de')));
+  }
+
+  /** Símbolo de copyleft: la © dada vuelta */
+  function copyleft(tam) {
+    return h('span', { class: 'copyleft', 'aria-label': 'Copyleft', style: tam ? { fontSize: tam } : null }, '©');
   }
 
   function pantallaCompleta() {
@@ -115,7 +123,7 @@ window.AV = window.AV || {};
   }
 
   Object.assign(AV, {
-    LETRAS, CLASES, h, aviso, generarCodigo, limpiarCodigo, generarId,
+    VERSION, copyleft, LETRAS, CLASES, h, aviso, generarCodigo, limpiarCodigo, generarId,
     normalizarPalabra, qrSVG, descargar, nombreArchivo, guardado, encabezado, pantallaCompleta
   });
 })(window.AV);
