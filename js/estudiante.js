@@ -138,23 +138,41 @@
 
     function pantallaOpciones(e) {
       cuerpo.innerHTML = '';
-      const respondida = e.respondio !== null && e.respondio !== undefined;
+      // respondio llega como lista de posiciones elegidas (o null si todavía no respondió)
+      const elegidas = Array.isArray(e.respondio) ? e.respondio : (e.respondio === null || e.respondio === undefined ? [] : [e.respondio]);
+      const respondida = elegidas.length > 0;
+      const marcadas = new Set();
       const grilla = h('div', { class: 'botones-resp' + (respondida ? ' bloqueados' : ''), role: 'group', 'aria-label': 'Opciones' });
+      const aviso = h('p', { class: 'suave', role: 'status', style: { textAlign: 'center', margin: 0 } },
+        respondida ? 'Respuesta enviada. Esperá a que se cierre la pregunta.' : (e.multiple ? 'Podés elegir más de una. Después tocá Enviar.' : ''));
+      const btnEnviar = e.multiple && !respondida ? h('button', {
+        class: 'boton boton-principal boton-grande', type: 'button', disabled: true, style: { width: '100%' },
+        onclick: () => mandar([...marcadas].sort())
+      }, 'Enviar respuesta') : null;
+
+      function mandar(lista) {
+        grilla.classList.add('bloqueados');
+        grilla.querySelectorAll('button').forEach(x => { x.disabled = true; x.classList.toggle('elegida', lista.includes(Number(x.dataset.k))); });
+        if (btnEnviar) btnEnviar.remove();
+        enviar({ t: 'resp', n: e.n, v: e.multiple ? lista : lista[0] });
+        aviso.textContent = 'Respuesta enviada. Esperá a que se cierre la pregunta.';
+      }
+
       e.opciones.forEach(o => {
         const b = h('button', {
-          class: 'boton-resp ' + AV.CLASES[o.k] + (e.respondio === o.k ? ' elegida' : ''), type: 'button', disabled: respondida,
+          class: 'boton-resp ' + AV.CLASES[o.k] + (elegidas.includes(o.k) ? ' elegida' : ''), type: 'button', disabled: respondida,
+          'data-k': o.k, 'aria-pressed': e.multiple ? String(elegidas.includes(o.k)) : null,
           onclick: () => {
-            grilla.classList.add('bloqueados');
-            b.classList.add('elegida');
-            grilla.querySelectorAll('button').forEach(x => { x.disabled = true; });
-            enviar({ t: 'resp', n: e.n, v: o.k });
-            aviso.textContent = 'Respuesta enviada. Esperá a que se cierre la pregunta.';
+            if (!e.multiple) { mandar([o.k]); return; }
+            marcadas.has(o.k) ? marcadas.delete(o.k) : marcadas.add(o.k);
+            b.classList.toggle('elegida', marcadas.has(o.k));
+            b.setAttribute('aria-pressed', String(marcadas.has(o.k)));
+            btnEnviar.disabled = marcadas.size === 0;
           }
         }, h('span', { class: 'letra' }, AV.LETRAS[o.k]), h('span', null, o.txt));
         grilla.append(b);
       });
-      const aviso = h('p', { class: 'suave', role: 'status', style: { textAlign: 'center', margin: 0 } }, respondida ? 'Respuesta enviada. Esperá a que se cierre la pregunta.' : '');
-      cuerpo.append(...cabeceraPregunta(e), grilla, aviso);
+      cuerpo.append(...cabeceraPregunta(e), grilla, btnEnviar, aviso);
       if (!respondida) grilla.querySelector('button').focus({ preventScroll: true });
     }
 
@@ -203,21 +221,25 @@
       } else if (!e.respondio) {
         sello = h('div', { class: 'sello mal', 'aria-hidden': 'true' }, '–');
         grande = 'Se terminó el tiempo';
-        chico = 'La correcta era: ' + e.textoCorrecta;
-      } else if (e.correcta) {
+        chico = (e.variasCorrectas ? 'Las correctas eran: ' : 'La correcta era: ') + e.textoCorrecta;
+      } else if (e.correcta === true) {
         sello = h('div', { class: 'sello bien', 'aria-hidden': 'true' }, '✓');
         grande = '¡Correcto!';
         chico = null;
+      } else if (e.correcta === 'parcial') {
+        sello = h('div', { class: 'sello neutro', 'aria-hidden': 'true' }, '≈');
+        grande = 'Casi';
+        chico = `Acertaste ${e.aciertos} de ${e.totalCorrectas}. Las correctas eran: ` + e.textoCorrecta;
       } else {
         sello = h('div', { class: 'sello mal', 'aria-hidden': 'true' }, '✗');
         grande = 'Esta vez no';
-        chico = 'La correcta era: ' + e.textoCorrecta;
+        chico = (e.variasCorrectas ? 'Las correctas eran: ' : 'La correcta era: ') + e.textoCorrecta;
       }
       cuerpo.innerHTML = '';
       cuerpo.append(h('div', { class: 'celu-centro', role: 'status' },
         sello,
         h('p', { class: 'grande' }, grande),
-        e.correcta ? h('p', { class: 'puntos-celu' }, '+' + e.ganados) : null,
+        e.ganados > 0 ? h('p', { class: 'puntos-celu' }, '+' + e.ganados) : null,
         chico ? h('p', null, chico) : null,
         (e.tipo === 'opcion' && !e.esEncuesta) ? h('p', { class: 'suave' }, `Vas ${e.puesto}° de ${e.de}, con ${e.puntos} puntos.`) : null));
     }

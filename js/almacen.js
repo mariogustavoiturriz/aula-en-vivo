@@ -23,6 +23,7 @@
       preguntas: [
         { id: 'e1', tipo: 'opcion', texto: '¿Cuál es la pendiente de y = 3x − 2?', opciones: ['3', '−2', '2/3', '−3'], correcta: 0, tiempo: 20 },
         { id: 'e2', tipo: 'opcion', texto: 'Si f(x) = 2x + 1, ¿cuánto vale f(4)?', opciones: ['7', '9', '8', '6'], correcta: 1, tiempo: 20 },
+        { id: 'e2b', tipo: 'opcion', texto: '¿Cuáles de estas son funciones lineales?', opciones: ['y = 2x + 1', 'y = x²', 'y = −x', 'y = 3/x'], multiple: true, correctas: [0, 2], tiempo: 30 },
         { id: 'e3', tipo: 'opcion', texto: 'Dos rectas son paralelas cuando tienen…', opciones: ['La misma pendiente', 'La misma ordenada al origen', 'Pendientes opuestas', 'Un punto en común'], correcta: 0, tiempo: 30 },
         { id: 'e4', tipo: 'opcion', texto: '¿Qué tan seguro o segura te sentís con este tema?', opciones: ['Muy seguro/a', 'Bastante', 'Más o menos', 'Necesito repasar'], correcta: null, tiempo: 30 },
         { id: 'e5', tipo: 'nube', texto: 'Escribí una palabra que asocies con «función»', tiempo: 60 }
@@ -97,8 +98,15 @@
         const ops = (Array.isArray(p.opciones) ? p.opciones : []).slice(0, 4).map(o => String(o ?? '').slice(0, 120));
         while (ops.length < 2) ops.push('');
         preg.opciones = ops;
-        preg.correcta = (p.correcta === null || p.correcta === undefined) ? null
-          : (Number.isInteger(p.correcta) && p.correcta >= 0 && p.correcta < ops.length ? p.correcta : 0);
+        if (p.multiple === true) {
+          // varias respuestas: correctas es una lista de posiciones, o null si es encuesta
+          preg.multiple = true;
+          preg.correctas = (p.correctas === null || (p.correctas === undefined && p.correcta === null)) ? null
+            : [...new Set((Array.isArray(p.correctas) ? p.correctas : [p.correcta]).filter(k => Number.isInteger(k) && k >= 0 && k < ops.length))].sort();
+        } else {
+          preg.correcta = (p.correcta === null || p.correcta === undefined) ? null
+            : (Number.isInteger(p.correcta) && p.correcta >= 0 && p.correcta < ops.length ? p.correcta : 0);
+        }
       }
       cuest.preguntas.push(preg);
     });
@@ -116,7 +124,9 @@
       if (p.tipo === 'opcion') {
         const llenas = p.opciones.filter(o => o.trim()).length;
         if (llenas < 2) lista.push(`La pregunta ${n} necesita al menos dos opciones.`);
-        if (p.correcta !== null && !String(p.opciones[p.correcta] || '').trim()) lista.push(`En la pregunta ${n}, la opción marcada como correcta está vacía.`);
+        const cor = correctasDe(p);
+        if (cor && !cor.length) lista.push(`En la pregunta ${n}, marcá al menos una respuesta correcta.`);
+        if (cor && cor.some(k => !String(p.opciones[k] || '').trim())) lista.push(`En la pregunta ${n}, hay una opción marcada como correcta que está vacía.`);
       }
     });
     return lista;
@@ -127,12 +137,19 @@
     AV.descargar(AV.nombreArchivo(cuest.titulo) + '.json', JSON.stringify(limpio, null, 2));
   }
 
-  function importarArchivo(archivo) {
+  /** Lee y revisa un archivo .json, sin guardarlo */
+  function leerArchivo(archivo) {
     return archivo.text().then(txt => {
       let datos;
       try { datos = JSON.parse(txt); } catch (e) { throw new Error('El archivo no es un JSON válido.'); }
       const { cuest, errores } = validar(datos);
       if (!cuest || errores.length) throw new Error(errores[0] || 'No se pudo leer el cuestionario.');
+      return cuest;
+    });
+  }
+
+  function importarArchivo(archivo) {
+    return leerArchivo(archivo).then(cuest => {
       if (obtener(cuest.id)) cuest.id = AV.generarId();
       guardar(cuest);
       return cuest;
@@ -155,5 +172,25 @@
   }
   function guardarRed(conf) { AV.guardado.escribir(CLAVE_RED, conf); }
 
-  AV.almacen = { TIEMPOS, REDES, nuevaPregunta, todos, obtener, guardar, crear, duplicar, borrar, validar, problemas, exportar, importarArchivo, leerRed, guardarRed };
+  /** Posiciones de las respuestas correctas, o null si la pregunta es una encuesta */
+  function correctasDe(p) {
+    if (p.tipo !== 'opcion') return null;
+    if (p.multiple) return Array.isArray(p.correctas) ? p.correctas : null;
+    return p.correcta === null || p.correcta === undefined ? null : [p.correcta];
+  }
+
+  /** Pasa una pregunta de una respuesta a varias, o al revés, conservando lo marcado */
+  function cambiarMultiple(p, multiple) {
+    if (multiple && !p.multiple) {
+      p.correctas = p.correcta === null ? null : [p.correcta];
+      delete p.correcta;
+      p.multiple = true;
+    } else if (!multiple && p.multiple) {
+      p.correcta = p.correctas === null ? null : (p.correctas[0] ?? 0);
+      delete p.correctas;
+      delete p.multiple;
+    }
+  }
+
+  AV.almacen = { TIEMPOS, REDES, correctasDe, cambiarMultiple, leerArchivo, nuevaPregunta, todos, obtener, guardar, crear, duplicar, borrar, validar, problemas, exportar, importarArchivo, leerRed, guardarRed };
 })(window.AV);

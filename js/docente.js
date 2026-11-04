@@ -81,6 +81,7 @@
           ...base, n, tipo: p.tipo, texto: p.texto,
           opciones: p.tipo === 'opcion' ? p.opciones.map((o, k) => ({ k, txt: o })).filter(o => o.txt.trim()) : null,
           restante: cerrada ? 0 : restanteMs(), duracion,
+          multiple: !!p.multiple,
           respondio: p.tipo === 'opcion' ? (r ? r.v : null) : null,
           palabras: p.tipo === 'nube' ? (j.resp[n] || []) : null,
           maxPalabras: MAX_PALABRAS
@@ -89,11 +90,14 @@
       if (fase === 'resultado' || fase === 'posiciones') {
         const p = preg();
         const r = respActuales.get(j.id);
+        const cor = AV.almacen.correctasDe(p);
         return {
-          ...base, fase: 'resultado', n, tipo: p.tipo, esEncuesta: p.tipo === 'opcion' && p.correcta === null,
+          ...base, fase: 'resultado', n, tipo: p.tipo, esEncuesta: p.tipo === 'opcion' && !cor,
           respondio: !!r || (p.tipo === 'nube' && (j.resp[n] || []).length > 0),
           correcta: r ? r.correcta : null, ganados: r ? r.puntos : 0,
-          textoCorrecta: p.tipo === 'opcion' && p.correcta !== null ? AV.LETRAS[p.correcta] + '. ' + p.opciones[p.correcta] : null,
+          aciertos: r ? r.aciertos : 0, totalCorrectas: cor ? cor.length : 0,
+          textoCorrecta: cor ? cor.map(k => AV.LETRAS[k] + '. ' + p.opciones[k]).join(' / ') : null,
+          variasCorrectas: !!(cor && cor.length > 1),
           puesto: puestoDe(j), de: jugadores.size
         };
       }
@@ -130,14 +134,23 @@
 
       if (datos.t === 'resp' && p.tipo === 'opcion') {
         if (respActuales.has(j.id)) return; // una sola respuesta
-        const v = Number(datos.v);
-        if (!Number.isInteger(v) || v < 0 || v >= p.opciones.length || !p.opciones[v].trim()) return;
-        const fraccion = restanteMs() / duracion;
-        const esEncuesta = p.correcta === null;
-        const correcta = esEncuesta ? null : v === p.correcta;
-        const puntos = correcta ? Math.round(500 + 500 * fraccion) : 0;
-        respActuales.set(j.id, { v, t: Date.now() - inicio, puntos, correcta });
-        j.resp[n] = v;
+        // siempre trabajamos con una lista de posiciones elegidas (una sola si no es múltiple)
+        const crudo = Array.isArray(datos.v) ? datos.v : [datos.v];
+        const sel = [...new Set(crudo.map(Number))]
+          .filter(k => Number.isInteger(k) && k >= 0 && k < p.opciones.length && p.opciones[k].trim()).sort();
+        if (!sel.length || (!p.multiple && sel.length > 1)) return;
+        const cor = AV.almacen.correctasDe(p);
+        let correcta = null, puntos = 0, aciertos = 0;
+        if (cor) {
+          // puntaje parcial: (aciertos − opciones mal elegidas) / cantidad de correctas, nunca negativo
+          aciertos = sel.filter(k => cor.includes(k)).length;
+          const errores = sel.length - aciertos;
+          const parte = Math.max(0, (aciertos - errores) / cor.length);
+          correcta = parte === 1 ? true : (parte > 0 ? 'parcial' : false);
+          puntos = parte > 0 ? Math.round((500 + 500 * restanteMs() / duracion) * parte) : 0;
+        }
+        respActuales.set(j.id, { v: sel, t: Date.now() - inicio, puntos, correcta, aciertos });
+        j.resp[n] = sel;
         j.puntos += puntos;
         enviarA(j);
         actualizarConteo();
@@ -238,7 +251,9 @@
       ref.regla = h('div', { class: 'regla', role: 'timer', 'aria-label': 'Tiempo restante' },
         h('div', { class: 'regla-avance' }), h('span', { class: 'regla-num' }, p.tiempo));
       ref.conteo = h('span', { class: 'contador-resp', 'aria-live': 'polite' }, '');
-      const tipoTxt = p.tipo === 'nube' ? 'Nube de palabras' : (p.correcta === null ? 'Encuesta' : 'Opción múltiple');
+      const esEnc = !AV.almacen.correctasDe(p);
+      const tipoTxt = p.tipo === 'nube' ? 'Nube de palabras'
+        : (esEnc ? 'Encuesta' : 'Opción múltiple') + (p.multiple ? ', se pueden elegir varias' : '');
 
       escena.append(
         h('div', { class: 'preg-meta' }, h('span', null, `Pregunta ${n + 1} de ${preguntas.length}`), h('span', null, tipoTxt)),
@@ -317,23 +332,25 @@
       ref.conteo.textContent = `${respActuales.size} ${respActuales.size === 1 ? 'respuesta' : 'respuestas'}`;
 
       if (p.tipo === 'opcion') {
+        const cor = AV.almacen.correctasDe(p);
         const cuenta = p.opciones.map(() => 0);
-        respActuales.forEach(r => cuenta[r.v]++);
+        respActuales.forEach(r => r.v.forEach(k => cuenta[k]++));
+        // porcentaje sobre quienes respondieron (en las de varias opciones puede sumar más de 100 %)
         const total = Math.max(1, respActuales.size);
         escena.classList.add('resultado');
-        escena.classList.toggle('encuesta-res', p.correcta === null);
+        escena.classList.toggle('encuesta-res', !cor);
         ref.opciones.querySelectorAll('.opcion-proy').forEach(el => {
           const k = Number(el.dataset.k);
-          el.querySelector('.cant').textContent = p.correcta === null ? Math.round(100 * cuenta[k] / total) + '%' : cuenta[k];
+          el.querySelector('.cant').textContent = !cor ? Math.round(100 * cuenta[k] / total) + '%' : cuenta[k];
           requestAnimationFrame(() => { el.querySelector('.relleno').style.width = (100 * cuenta[k] / total) + '%'; });
-          if (k === p.correcta) el.classList.add('es-correcta');
+          if (cor && cor.includes(k)) el.classList.add('es-correcta');
         });
       }
 
       const controles = escena.querySelector('.controles-proy');
       controles.innerHTML = '';
-      const hayPuntos = preguntas.some(q => q.tipo === 'opcion' && q.correcta !== null);
-      if (p.tipo === 'opcion' && p.correcta !== null && !ultima) {
+      const hayPuntos = preguntas.some(q => AV.almacen.correctasDe(q));
+      if (AV.almacen.correctasDe(p) && !ultima) {
         controles.append(h('button', { class: 'boton boton-grande', type: 'button', onclick: escenaPosiciones }, 'Ver posiciones'));
       }
       controles.append(h('button', { class: 'boton boton-principal boton-grande', type: 'button', 'data-avanzar': '', onclick: siguiente },
@@ -362,7 +379,7 @@
       escena.className = 'escena';
       escena.innerHTML = '';
       const r = ranking();
-      const hayPuntos = preguntas.some(q => q.tipo === 'opcion' && q.correcta !== null);
+      const hayPuntos = preguntas.some(q => AV.almacen.correctasDe(q));
       escena.append(h('h1', null, hayPuntos ? '¡Terminamos!' : '¡Gracias por participar!'));
       if (hayPuntos && r.length) {
         const col = (j, i) => j ? h('div', { class: 'podio-col p' + (i + 1) },
@@ -397,7 +414,14 @@
           const r = j.resp[i];
           if (r === undefined) fila.push('');
           else if (p.tipo === 'nube') fila.push(r.join(', '));
-          else fila.push(AV.LETRAS[r] + (p.correcta === null ? '' : (r === p.correcta ? ' (bien)' : ' (mal)')));
+          else {
+            const cor = AV.almacen.correctasDe(p);
+            const letras = r.map(k => AV.LETRAS[k]).join('+');
+            if (!cor) { fila.push(letras); return; }
+            const bien = r.length === cor.length && r.every(k => cor.includes(k));
+            const parcial = !bien && r.some(k => cor.includes(k));
+            fila.push(letras + (bien ? ' (bien)' : parcial ? ' (parcial)' : ' (mal)'));
+          }
         });
         filas.push(fila.map(celda).join(';'));
       });

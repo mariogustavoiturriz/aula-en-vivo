@@ -6,7 +6,7 @@
   const { h } = AV;
   const NOMBRE_TIPO = { opcion: 'Opción múltiple', encuesta: 'Encuesta (sin respuesta correcta)', nube: 'Nube de palabras' };
 
-  function tipoVisible(p) { return p.tipo === 'nube' ? 'nube' : (p.correcta === null ? 'encuesta' : 'opcion'); }
+  function tipoVisible(p) { return p.tipo === 'nube' ? 'nube' : (AV.almacen.correctasDe(p) === null ? 'encuesta' : 'opcion'); }
 
   function render(main, id) {
     const cuest = AV.almacen.obtener(id);
@@ -41,7 +41,7 @@
       const tipo = tipoVisible(p);
       const caja = h('section', { class: 'papel preg-editor', 'data-id': p.id, 'aria-label': `Pregunta ${i + 1}` });
       caja.append(h('span', { class: 'numero', 'aria-hidden': 'true' }, i + 1));
-      caja.append(h('div', { class: 'tipo' }, NOMBRE_TIPO[tipo]));
+      caja.append(h('div', { class: 'tipo' }, NOMBRE_TIPO[tipo] + (p.multiple ? ', con varias respuestas' : '')));
 
       const idTexto = 'txt-' + p.id;
       caja.append(h('div', { class: 'campo' },
@@ -65,13 +65,29 @@
               placeholder: k < 2 ? 'Opción ' + AV.LETRAS[k] : 'Opción ' + AV.LETRAS[k] + ' (opcional)',
               oninput: e => { p.opciones[k] = e.target.value; guardarPronto(); }
             }),
-            p.correcta !== null ? h('label', { class: 'correcta-toggle' },
-              h('input', {
-                type: 'radio', name: grupo, checked: p.correcta === k,
-                onchange: () => { p.correcta = k; guardarYa(); }
-              }), 'Correcta') : null
+            tipo === 'opcion' ? h('label', { class: 'correcta-toggle' },
+              p.multiple
+                ? h('input', {
+                  type: 'checkbox', checked: p.correctas.includes(k),
+                  onchange: e => {
+                    const set = new Set(p.correctas);
+                    e.target.checked ? set.add(k) : set.delete(k);
+                    p.correctas = [...set].sort(); guardarYa();
+                  }
+                })
+                : h('input', {
+                  type: 'radio', name: grupo, checked: p.correcta === k,
+                  onchange: () => { p.correcta = k; guardarYa(); }
+                }), 'Correcta') : null
           ));
         });
+        opciones.append(h('label', { class: 'correcta-toggle', style: { marginTop: '10px', fontWeight: 700 } },
+          h('input', {
+            type: 'checkbox', checked: !!p.multiple,
+            onchange: e => { AV.almacen.cambiarMultiple(p, e.target.checked); guardarYa(); dibujar(); lista.querySelector(`[data-id="${p.id}"] [data-multiple]`)?.focus(); },
+            'data-multiple': ''
+          }),
+          tipo === 'opcion' ? 'Hay más de una respuesta correcta (se eligen varias)' : 'Se pueden elegir varias opciones'));
         caja.append(opciones);
       }
 
@@ -123,9 +139,25 @@
       location.hash = '#/presentar/' + cuest.id;
     }
 
+    // Importar: suma al final las preguntas de otro cuestionario exportado (.json)
+    const archivo = h('input', { type: 'file', accept: '.json,application/json', class: 'oculto-visual', id: 'importar-preg', onchange: e => {
+      const f = e.target.files[0];
+      if (!f) return;
+      AV.almacen.leerArchivo(f).then(otro => {
+        const nuevas = otro.preguntas.map(p => ({ ...p, id: AV.generarId() }));
+        // si el cuestionario estaba recién creado y vacío, lo reemplazamos en vez de sumar
+        const vacio = cuest.preguntas.length === 1 && !cuest.preguntas[0].texto.trim();
+        if (vacio) { cuest.preguntas = nuevas; if (cuest.titulo === 'Cuestionario sin título') { cuest.titulo = otro.titulo; titulo.value = otro.titulo; } }
+        else cuest.preguntas.push(...nuevas);
+        guardarYa(); dibujar(nuevas[0] && nuevas[0].id);
+        AV.aviso(nuevas.length === 1 ? 'Agregaste 1 pregunta' : `Agregaste ${nuevas.length} preguntas`);
+      }).catch(err => AV.aviso(err.message, 4500)).finally(() => { e.target.value = ''; });
+    } });
+
     main.innerHTML = '';
     main.append(
       AV.encabezado(h('div', { class: 'fila' },
+        h('label', { class: 'boton', for: 'importar-preg', style: { margin: 0 } }, 'Importar'), archivo,
         h('button', { class: 'boton', type: 'button', onclick: () => { guardarYa(); AV.almacen.exportar(cuest); } }, 'Exportar'),
         h('button', { class: 'boton boton-principal', type: 'button', onclick: presentar }, 'Presentar'))),
       h('div', { class: 'hoja pila' },

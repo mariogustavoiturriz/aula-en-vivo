@@ -7,12 +7,13 @@ Forma parte de la misma familia que *Realidad aumentada para el aula*: una pági
 ## Qué se puede hacer
 
 - **Opción múltiple** de 2 a 4 opciones, con tiempo y puntaje por rapidez (entre 500 y 1000 puntos por respuesta correcta).
-- **Encuestas** sin respuesta correcta: muestran porcentajes y no suman puntos.
+- **Varias respuestas correctas**: el estudiante marca todas las que le parecen y toca Enviar. El puntaje es parcial: se cuentan los aciertos, se descuentan las opciones mal elegidas y se divide por la cantidad de correctas (nunca da negativo). Si marca todo, no suma.
+- **Encuestas** sin respuesta correcta, de una o de varias opciones: muestran porcentajes y no suman puntos.
 - **Nubes de palabras**: cada estudiante manda hasta 3 palabras y la nube crece en vivo en el proyector. Agrupa mayúsculas y tildes (*Gráfico* y *grafico* cuentan como la misma).
 - Posiciones entre preguntas, podio final y **descarga de resultados en CSV** (abre directo en Excel o en Hojas de cálculo).
 - El docente puede **sacar de la sala** a alguien que entró con un nombre inapropiado.
 - Si un celular se desconecta o se recarga la página, vuelve a entrar y **conserva sus puntos**.
-- Exportar e importar cuestionarios como archivo `.json`, para compartirlos entre colegas.
+- Exportar e importar cuestionarios como archivo `.json`, para compartirlos entre colegas. Desde el inicio se importa un cuestionario completo; desde el editor se suman las preguntas de un archivo al cuestionario que estás armando.
 
 ## Cómo se usa
 
@@ -83,6 +84,7 @@ Publicado detrás de HTTPS (por ejemplo en un servidor de la institución), su d
   "titulo": "Repaso: función lineal",
   "preguntas": [
     { "tipo": "opcion", "texto": "¿Cuál es la pendiente de y = 3x − 2?", "opciones": ["3", "−2", "2/3", "−3"], "correcta": 0, "tiempo": 20 },
+    { "tipo": "opcion", "texto": "¿Cuáles son funciones lineales?", "opciones": ["y = 2x + 1", "y = x²", "y = −x"], "multiple": true, "correctas": [0, 2], "tiempo": 30 },
     { "tipo": "opcion", "texto": "¿Qué tan seguro o segura te sentís?", "opciones": ["Mucho", "Bastante", "Poco"], "correcta": null, "tiempo": 30 },
     { "tipo": "nube", "texto": "Una palabra que asocies con «función»", "tiempo": 60 }
   ]
@@ -90,6 +92,7 @@ Publicado detrás de HTTPS (por ejemplo en un servidor de la institución), su d
 ```
 
 - `correcta` es la posición de la opción correcta empezando en 0 (A = 0, B = 1…). Con `null` la pregunta es una encuesta.
+- Con `"multiple": true` se pueden elegir varias opciones, y en lugar de `correcta` va `correctas`, una lista de posiciones. Con `"correctas": null` es una encuesta de varias opciones.
 - `tiempo` en segundos: 10, 20, 30, 45, 60, 90 o 120.
 
 Hay un ejemplo completo en `ejemplos/`.

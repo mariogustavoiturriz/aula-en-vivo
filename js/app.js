@@ -83,7 +83,9 @@
               h('label', { class: 'boton', for: 'importar', style: { margin: 0 } }, 'Importar archivo'), archivo))),
 
         h('section', { class: 'papel', style: { marginTop: '20px' }, 'aria-labelledby': 't-mis' },
-          h('h2', { id: 't-mis' }, 'Mis cuestionarios'),
+          h('div', { class: 'fila-entre' },
+            h('h2', { id: 't-mis', style: { margin: 0 } }, 'Mis cuestionarios'),
+            h('label', { class: 'boton', for: 'importar', style: { margin: 0 } }, 'Importar un cuestionario')),
           h('p', { class: 'suave chico' }, 'Están guardados en este navegador. Exportalos para tener una copia o pasarlos a otra compu.'),
           lista),
 

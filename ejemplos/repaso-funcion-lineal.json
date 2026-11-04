@@ -3,10 +3,74 @@
   "version": 1,
   "titulo": "Repaso: función lineal",
   "preguntas": [
-    { "tipo": "opcion", "texto": "¿Cuál es la pendiente de y = 3x − 2?", "opciones": ["3", "−2", "2/3", "−3"], "correcta": 0, "tiempo": 20 },
-    { "tipo": "opcion", "texto": "Si f(x) = 2x + 1, ¿cuánto vale f(4)?", "opciones": ["7", "9", "8", "6"], "correcta": 1, "tiempo": 20 },
-    { "tipo": "opcion", "texto": "Dos rectas son paralelas cuando tienen…", "opciones": ["La misma pendiente", "La misma ordenada al origen", "Pendientes opuestas", "Un punto en común"], "correcta": 0, "tiempo": 30 },
-    { "tipo": "opcion", "texto": "¿Qué tan seguro o segura te sentís con este tema?", "opciones": ["Muy seguro/a", "Bastante", "Más o menos", "Necesito repasar"], "correcta": null, "tiempo": 30 },
-    { "tipo": "nube", "texto": "Escribí una palabra que asocies con «función»", "tiempo": 60 }
+    {
+      "tipo": "opcion",
+      "texto": "¿Cuál es la pendiente de y = 3x − 2?",
+      "opciones": [
+        "3",
+        "−2",
+        "2/3",
+        "−3"
+      ],
+      "correcta": 0,
+      "tiempo": 20
+    },
+    {
+      "tipo": "opcion",
+      "texto": "Si f(x) = 2x + 1, ¿cuánto vale f(4)?",
+      "opciones": [
+        "7",
+        "9",
+        "8",
+        "6"
+      ],
+      "correcta": 1,
+      "tiempo": 20
+    },
+    {
+      "tipo": "opcion",
+      "texto": "¿Cuáles de estas son funciones lineales?",
+      "opciones": [
+        "y = 2x + 1",
+        "y = x²",
+        "y = −x",
+        "y = 3/x"
+      ],
+      "multiple": true,
+      "correctas": [
+        0,
+        2
+      ],
+      "tiempo": 30
+    },
+    {
+      "tipo": "opcion",
+      "texto": "Dos rectas son paralelas cuando tienen…",
+      "opciones": [
+        "La misma pendiente",
+        "La misma ordenada al origen",
+        "Pendientes opuestas",
+        "Un punto en común"
+      ],
+      "correcta": 0,
+      "tiempo": 30
+    },
+    {
+      "tipo": "opcion",
+      "texto": "¿Qué tan seguro o segura te sentís con este tema?",
+      "opciones": [
+        "Muy seguro/a",
+        "Bastante",
+        "Más o menos",
+        "Necesito repasar"
+      ],
+      "correcta": null,
+      "tiempo": 30
+    },
+    {
+      "tipo": "nube",
+      "texto": "Escribí una palabra que asocies con «función»",
+      "tiempo": 60
+    }
   ]
 }
