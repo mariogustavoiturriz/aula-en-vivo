@@ -1,0 +1,17 @@
+--- a/@trystero-p2p/core/dist/topic-strategy.mjs	2026-11-04 12:35:21.520526055 +0000
++++ b/@trystero-p2p/core/dist/topic-strategy.mjs	2026-11-04 12:35:21.536558037 +0000
+@@ -55,8 +55,12 @@
+ 			peerId: selfId,
+ 			...extraPayload
+ 		}), makeTopicContext(context, "announce", rootTopic, selfTopic));
+-		return typeof result === "number" || result !== void 0 && "stopAnnouncing" in result ? result : {
+-			nextAnnounceMs: result?.nextAnnounceMs ?? steadyAnnounceIntervalMs,
++		if (typeof result === "number" || result !== void 0 && "stopAnnouncing" in result) return result;
++		// [Aula en Vivo] intervalo de anuncio configurable (config.announceIntervalMs), sin acortar esperas por límite de los relays
++		const nextMs = result?.nextAnnounceMs ?? steadyAnnounceIntervalMs;
++		const requestedMs = context.config?.announceIntervalMs;
++		return {
++			nextAnnounceMs: requestedMs > 0 && nextMs <= steadyAnnounceIntervalMs ? Math.min(nextMs, requestedMs) : nextMs,
+ 			reannounceOnDisconnect: result?.reannounceOnDisconnect ?? reannounceOnDisconnect
+ 		};
+ 	},

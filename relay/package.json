@@ -1,0 +1,12 @@
+{
+  "name": "aula-en-vivo-relay",
+  "version": "1.0.0",
+  "description": "Relay propio y opcional para Aula en Vivo",
+  "type": "module",
+  "private": true,
+  "license": "GPL-3.0-or-later",
+  "author": "Mario Gustavo Iturriz",
+  "scripts": { "start": "node servidor.js" },
+  "dependencies": { "@trystero-p2p/ws-relay": "^0.26.0" },
+  "engines": { "node": ">=18" }
+}
