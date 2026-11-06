@@ -22,7 +22,7 @@
         lista.append(h('li', null,
           h('div', null,
             h('div', { class: 'nombre' }, c.titulo),
-            h('div', { class: 'suave chico' }, nPreg === 1 ? '1 pregunta' : `${nPreg} preguntas`)),
+            h('div', { class: 'suave chico' }, (c.modo === 'escape' ? 'Escape room · ' : c.modo === 'set' ? 'Set de actividades · ' : '') + (nPreg === 1 ? '1 pregunta' : `${nPreg} preguntas`))),
           h('div', { class: 'fila' },
             h('a', { class: 'boton', href: '#/editar/' + c.id }, 'Editar'),
             h('a', { class: 'boton boton-principal', href: '#/presentar/' + c.id }, 'Presentar'),
@@ -77,9 +77,11 @@
 
           h('section', { class: 'papel camino', 'aria-labelledby': 't-armar' },
             h('h2', { id: 't-armar' }, 'Armar un cuestionario'),
-            h('p', null, 'Opción múltiple con puntaje por rapidez, encuestas sin respuesta correcta y nubes de palabras.'),
+            h('p', null, 'En vivo como Kahoot o Menti, o a su ritmo como escape room o set de actividades. Las plantillas vienen con un ejemplo para cambiar.'),
             h('div', { class: 'fila' },
               h('button', { class: 'boton boton-principal', type: 'button', onclick: () => { const c = AV.almacen.crear(); location.hash = '#/editar/' + c.id; } }, 'Nuevo cuestionario'),
+              h('button', { class: 'boton', type: 'button', onclick: () => { const c = AV.almacen.crearDesdePlantilla('escape'); location.hash = '#/editar/' + c.id; } }, '🔐 Escape room'),
+              h('button', { class: 'boton', type: 'button', onclick: () => { const c = AV.almacen.crearDesdePlantilla('set'); location.hash = '#/editar/' + c.id; } }, '🧭 Set de actividades'),
               h('label', { class: 'boton', for: 'importar', style: { margin: 0 } }, 'Importar archivo'), archivo))),
 
         h('section', { class: 'papel', style: { marginTop: '20px' }, 'aria-labelledby': 't-mis' },

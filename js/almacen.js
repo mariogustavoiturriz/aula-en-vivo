@@ -6,11 +6,19 @@
   const CLAVE = 'aulaenvivo.cuestionarios';
   const CLAVE_RED = 'aulaenvivo.red';
   const TIEMPOS = [10, 20, 30, 45, 60, 90, 120];
+  const MODOS = ['vivo', 'escape', 'set'];
+  const TIEMPOS_TOTALES = [0, 5, 10, 15, 20, 30, 45, 60]; // minutos para el escape room (0 = sin límite)
 
   function nuevaPregunta(tipo) {
     const base = { id: AV.generarId(), tipo, texto: '', tiempo: tipo === 'nube' ? 60 : 20 };
     if (tipo === 'opcion') return { ...base, opciones: ['', '', '', ''], correcta: 0 };
     if (tipo === 'encuesta') return { ...base, tipo: 'opcion', opciones: ['', '', '', ''], correcta: null, tiempo: 30 };
+    if (tipo === 'texto') return { ...base, respuestas: [''], tiempo: 30 };
+    if (tipo === 'vf') return { ...base, tipo: 'opcion', opciones: ['Verdadero', 'Falso'], correcta: 0 };
+    if (tipo === 'orden') return { ...base, items: ['', '', '', ''], tiempo: 30 };
+    if (tipo === 'ranking') return { ...base, tipo: 'orden', items: ['', '', '', ''], sinCorrecta: true, tiempo: 45 };
+    if (tipo === 'numero') return { ...base, min: 0, max: 100, paso: 1, respuesta: 50, margen: 5, tiempo: 30 };
+    if (tipo === 'escala') return { ...base, tipo: 'numero', min: 1, max: 5, paso: 1, respuesta: null, margen: 0, etiquetaMin: 'Nada', etiquetaMax: 'Mucho', tiempo: 30 };
     return base; // nube
   }
 
@@ -53,7 +61,7 @@
 
   function crear() {
     const ahora = Date.now();
-    const c = { id: AV.generarId(), titulo: 'Cuestionario sin título', creado: ahora, modificado: ahora, version: 1, preguntas: [nuevaPregunta('opcion')] };
+    const c = { id: AV.generarId(), titulo: 'Cuestionario sin título', modo: 'vivo', creado: ahora, modificado: ahora, version: 1, preguntas: [nuevaPregunta('opcion')] };
     guardar(c);
     return c;
   }
@@ -82,18 +90,40 @@
       creado: Number(datos.creado) || Date.now(),
       modificado: Date.now(),
       version: 1,
+      modo: MODOS.includes(datos.modo) ? datos.modo : 'vivo',
+      tiempoTotal: TIEMPOS_TOTALES.includes(Number(datos.tiempoTotal)) ? Number(datos.tiempoTotal) : 0,
       preguntas: []
     };
     const lista = Array.isArray(datos.preguntas) ? datos.preguntas : [];
     lista.slice(0, 100).forEach((p, i) => {
       if (!p || typeof p !== 'object') return;
-      const tipo = p.tipo === 'nube' ? 'nube' : 'opcion';
+      const tipo = ['nube', 'texto', 'orden', 'numero'].includes(p.tipo) ? p.tipo : 'opcion';
       const preg = {
         id: typeof p.id === 'string' ? p.id.slice(0, 40) : AV.generarId(),
         tipo,
         texto: String(p.texto || '').slice(0, 300),
         tiempo: TIEMPOS.includes(Number(p.tiempo)) ? Number(p.tiempo) : (tipo === 'nube' ? 60 : 20)
       };
+      if ([0, 1000, 2000].includes(Number(p.puntos)) && Number(p.puntos) !== 1000) preg.puntos = Number(p.puntos);
+      if (tipo === 'orden') {
+        preg.items = (Array.isArray(p.items) ? p.items : []).slice(0, 6).map(t => String(t ?? '').slice(0, 80));
+        while (preg.items.length < 2) preg.items.push('');
+        if (p.sinCorrecta) preg.sinCorrecta = true;
+      }
+      if (tipo === 'numero') {
+        const num = (v, d) => Number.isFinite(Number(v)) && v !== null && v !== '' ? Number(v) : d;
+        preg.min = num(p.min, 0); preg.max = num(p.max, 100);
+        if (preg.max <= preg.min) preg.max = preg.min + 1;
+        preg.paso = num(p.paso, 1) > 0 ? num(p.paso, 1) : 1;
+        preg.respuesta = p.respuesta === null || p.respuesta === undefined ? null : Math.min(preg.max, Math.max(preg.min, num(p.respuesta, preg.min)));
+        preg.margen = Math.max(0, num(p.margen, 0));
+        if (p.etiquetaMin) preg.etiquetaMin = String(p.etiquetaMin).slice(0, 30);
+        if (p.etiquetaMax) preg.etiquetaMax = String(p.etiquetaMax).slice(0, 30);
+      }
+      if (tipo === 'texto') {
+        preg.respuestas = (Array.isArray(p.respuestas) ? p.respuestas : [p.respuesta]).slice(0, 10).map(r => String(r ?? '').slice(0, 60));
+        if (!preg.respuestas.length) preg.respuestas = [''];
+      }
       if (tipo === 'opcion') {
         const ops = (Array.isArray(p.opciones) ? p.opciones : []).slice(0, 4).map(o => String(o ?? '').slice(0, 120));
         while (ops.length < 2) ops.push('');
@@ -128,6 +158,12 @@
         if (cor && !cor.length) lista.push(`En la pregunta ${n}, marcá al menos una respuesta correcta.`);
         if (cor && cor.some(k => !String(p.opciones[k] || '').trim())) lista.push(`En la pregunta ${n}, hay una opción marcada como correcta que está vacía.`);
       }
+      if (p.tipo === 'texto' && !p.respuestas.some(r => normalizarRespuesta(r))) lista.push(`En la pregunta ${n}, escribí la respuesta correcta.`);
+      if (p.tipo === 'orden' && p.items.filter(t => t.trim()).length < 2) lista.push(`La pregunta ${n} necesita al menos dos elementos para ordenar.`);
+      if (p.tipo === 'orden' && p.items.some(t => !t.trim()) && p.items.filter(t => t.trim()).length >= 2) {
+        p.items = p.items.filter(t => t.trim()); // los vacíos del final no cuentan
+      }
+      if (p.tipo === 'numero' && (p.max - p.min) / p.paso > 1000) lista.push(`En la pregunta ${n}, el deslizador tiene demasiados pasos: agrandá el paso.`);
     });
     return lista;
   }
@@ -192,5 +228,70 @@
     }
   }
 
-  AV.almacen = { TIEMPOS, REDES, correctasDe, cambiarMultiple, leerArchivo, nuevaPregunta, todos, obtener, guardar, crear, duplicar, borrar, validar, problemas, exportar, importarArchivo, leerRed, guardarRed };
+  /** Normaliza una respuesta escrita: sin tildes ni mayúsculas, sin espacios, y con coma decimal igual a punto */
+  function normalizarRespuesta(txt) {
+    return String(txt ?? '')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/(\d),(\d)/g, '$1.$2')
+      .replace(/[^a-z0-9ñ./-]/g, '');
+  }
+  /** ¿La respuesta escrita coincide con alguna de las aceptadas? */
+  function respuestaCorrecta(p, txt) {
+    const r = normalizarRespuesta(txt);
+    return !!r && p.respuestas.some(ok => normalizarRespuesta(ok) === r);
+  }
+  /** ¿La pregunta tiene respuesta correcta (suma puntos)? */
+  function calificable(p) {
+    if (p.puntos === 0) return false;
+    if (p.tipo === 'texto') return true;
+    if (p.tipo === 'orden') return !p.sinCorrecta;
+    if (p.tipo === 'numero') return p.respuesta !== null && p.respuesta !== undefined;
+    return !!correctasDe(p);
+  }
+  /** ¿Tiene respuesta correcta aunque no sume puntos? (para mostrarla) */
+  function tieneCorrecta(p) {
+    if (p.tipo === 'texto') return true;
+    if (p.tipo === 'orden') return !p.sinCorrecta;
+    if (p.tipo === 'numero') return p.respuesta !== null && p.respuesta !== undefined;
+    if (p.tipo === 'nube') return false;
+    return !!correctasDe(p);
+  }
+
+  // ----- Plantillas -----
+  function plantillaEscape() {
+    return {
+      titulo: 'Escape del aula de Matemática', modo: 'escape', tiempoTotal: 15,
+      preguntas: [
+        { tipo: 'opcion', texto: 'Candado 1. En la pizarra quedó escrita una ecuación: si 3x + 5 = 20, ¿cuánto vale x?', opciones: ['3', '5', '15', '25/3'], correcta: 1 },
+        { tipo: 'texto', texto: 'Candado 2. El código tiene tres cifras. La 1.ª es el resultado de 2³ − 5, la 2.ª es la raíz cuadrada de 49 y la 3.ª es 15 dividido 3. ¿Cuál es el código?', respuestas: ['375'] },
+        { tipo: 'opcion', texto: 'Candado 3. El armario se abre marcando todos los números primos. ¿Cuáles son?', opciones: ['2', '9', '13', '21'], multiple: true, correctas: [0, 2] },
+        { tipo: 'texto', texto: 'Candado 4. ¿Cuántos grados suman los ángulos interiores de un cuadrilátero?', respuestas: ['360'] },
+        { tipo: 'opcion', texto: 'Última puerta. ¿Cuál es la pendiente de la recta que pasa por (0, 1) y (2, 5)?', opciones: ['2', '4', '1/2', '3'], correcta: 0 }
+      ]
+    };
+  }
+  function plantillaSet() {
+    return {
+      titulo: 'Repaso de geometría', modo: 'set', tiempoTotal: 0,
+      preguntas: [
+        { tipo: 'opcion', texto: '¿Cuánto suman los ángulos interiores de un triángulo?', opciones: ['90°', '180°', '270°', '360°'], correcta: 1 },
+        { tipo: 'opcion', texto: '¿Cuáles de estas figuras tienen cuatro lados?', opciones: ['Cuadrado', 'Triángulo', 'Rombo', 'Pentágono'], multiple: true, correctas: [0, 2] },
+        { tipo: 'texto', texto: 'Un rectángulo mide 5 cm por 3 cm. ¿Cuál es su área, en cm²?', respuestas: ['15'] },
+        { tipo: 'texto', texto: '¿Cuántas diagonales tiene un pentágono?', respuestas: ['5', 'cinco'] },
+        { tipo: 'opcion', texto: 'Si un ángulo mide 35°, ¿cuánto mide su complemento?', opciones: ['55°', '145°', '65°', '45°'], correcta: 0 },
+        { tipo: 'nube', texto: 'Escribí una palabra que te haga pensar en la geometría' }
+      ]
+    };
+  }
+  /** Crea y guarda un cuestionario nuevo a partir de una plantilla ('escape' o 'set') */
+  function crearDesdePlantilla(cual) {
+    const { cuest } = validar(cual === 'escape' ? plantillaEscape() : plantillaSet());
+    cuest.id = AV.generarId();
+    cuest.preguntas.forEach(p => { p.id = AV.generarId(); });
+    guardar(cuest);
+    return cuest;
+  }
+
+  AV.almacen = { TIEMPOS, REDES, MODOS, TIEMPOS_TOTALES, normalizarRespuesta, respuestaCorrecta, calificable, tieneCorrecta, crearDesdePlantilla, correctasDe, cambiarMultiple, leerArchivo, nuevaPregunta, todos, obtener, guardar, crear, duplicar, borrar, validar, problemas, exportar, importarArchivo, leerRed, guardarRed };
 })(window.AV);

@@ -6,14 +6,34 @@ Forma parte de la misma familia que *Realidad aumentada para el aula*: una pági
 
 ## Qué se puede hacer
 
-- **Opción múltiple** de 2 a 4 opciones, con tiempo y puntaje por rapidez (entre 500 y 1000 puntos por respuesta correcta).
-- **Varias respuestas correctas**: el estudiante marca todas las que le parecen y toca Enviar. El puntaje es parcial: se cuentan los aciertos, se descuentan las opciones mal elegidas y se divide por la cantidad de correctas (nunca da negativo). Si marca todo, no suma.
-- **Encuestas** sin respuesta correcta, de una o de varias opciones: muestran porcentajes y no suman puntos.
-- **Nubes de palabras**: cada estudiante manda hasta 3 palabras y la nube crece en vivo en el proyector. Agrupa mayúsculas y tildes (*Gráfico* y *grafico* cuentan como la misma).
+Las funciones salen de mirar en detalle cómo trabajan Kahoot y Mentimeter, y quedarse con lo que sirve en el aula.
+
+**Tres formas de jugar**
+- **En vivo** (como Kahoot y Menti): todos responden la misma pregunta a la vez y el docente las pasa desde el proyector.
+- **Escape room**: cada pregunta es un candado. Hasta que no la responden bien no ven la siguiente. Avanzan a su ritmo, solos o por equipo, con tiempo total opcional. En el proyector se ve quién va abriendo cada candado.
+- **Set de actividades**: un menú con todas las actividades, que hacen en el orden que quieran. Cada una se responde una vez.
+
+**Para evaluar** (suman puntos)
+- **Opción múltiple** de 2 a 4 opciones, con una o varias correctas (puntaje parcial).
+- **Verdadero o falso**.
+- **Respuesta escrita**: no importan mayúsculas, tildes ni espacios, y 3,5 vale igual que 3.5. Se pueden cargar varias respuestas válidas.
+- **Ordenar**: de 2 a 6 elementos que aparecen mezclados y se acomodan con flechas.
+- **Adivinar el número**: un deslizador con margen aceptado. Cuanto más cerca, más puntos (80 % precisión y 20 % rapidez, igual que el slider de Kahoot).
+
+**Para opinar** (no suman puntos)
+- **Encuesta** de una o varias opciones, con porcentajes.
+- **Escala** (como en Menti): un deslizador con textos en los extremos; muestra cuántos eligieron cada valor y el promedio.
+- **Ranking** (como en Menti): cada uno ordena según lo que piensa y se ve el puesto promedio.
+- **Nube de palabras** en vivo, que agrupa mayúsculas y tildes.
+
+**Puntaje y juego**
+- Fórmula de Kahoot: la respuesta correcta vale 1000 si es inmediata y baja hasta 500 al final del tiempo. Cada pregunta puede valer normal, doble o sin puntos.
+- **Rachas**: desde la segunda correcta seguida suman 100, 200… hasta 500 extra, con el 🔥 en el celu y en las posiciones.
+- **Avatares**: cada estudiante arma su criatura por partes (color, forma, ojos, boca y accesorio) o la sortea. Aparece en la sala, en las posiciones, en el podio y en el avance de los modos a su ritmo. También hay un botón para inventar un apodo (fauna del sur: Pingüino Sabio, Carpincho Veloz…).
+- **Reacciones** (como en Menti): desde el celu se mandan 👏 ❤️ 😂 😮 🤔 🔥 que suben por el proyector con el avatar de quien las manda.
 - Posiciones entre preguntas, podio final y **descarga de resultados en CSV** (abre directo en Excel o en Hojas de cálculo).
-- El docente puede **sacar de la sala** a alguien que entró con un nombre inapropiado.
-- Si un celular se desconecta o se recarga la página, vuelve a entrar y **conserva sus puntos**.
-- Exportar e importar cuestionarios como archivo `.json`, para compartirlos entre colegas. Desde el inicio se importa un cuestionario completo; desde el editor se suman las preguntas de un archivo al cuestionario que estás armando.
+- El docente puede **sacar de la sala** a quien entre con un nombre inapropiado. Si un celu se corta, vuelve a entrar con sus puntos.
+- Exportar e importar cuestionarios como `.json`. Plantillas de escape room y set de actividades para arrancar.
 
 ## Cómo se usa
 
