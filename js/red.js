@@ -21,7 +21,7 @@
     if (cargando[red]) return cargando[red];
     cargando[red] = new Promise((ok, mal) => {
       const s = document.createElement('script');
-      s.src = ARCHIVOS[red];
+      s.src = ARCHIVOS[red] + '?v=' + (AV.VERSION || '');
       s.onload = () => (window.RedAula && window.RedAula[clave]) ? ok(window.RedAula[clave]) : mal(new Error('La librería de conexión no se cargó bien.'));
       s.onerror = () => { delete cargando[red]; mal(new Error('No se encontró ' + ARCHIVOS[red] + '. ¿Está la carpeta lib/ completa?')); };
       document.head.append(s);
