@@ -255,6 +255,7 @@
       AV.encabezado(h('div', { class: 'fila' },
         h('label', { class: 'boton', for: 'importar-preg', style: { margin: 0 } }, 'Importar'), archivo,
         h('button', { class: 'boton', type: 'button', onclick: () => { guardarYa(); AV.almacen.exportar(cuest); } }, 'Exportar'),
+        h('button', { class: 'boton', type: 'button', title: 'Paquete SCORM 1.2 para Moodle o el campus del INFD', onclick: () => { guardarYa(); AV.scorm.exportar(cuest); } }, 'SCORM'),
         h('button', { class: 'boton boton-principal', type: 'button', onclick: presentar }, 'Presentar'))),
       h('div', { class: 'hoja pila' },
         h('div', { class: 'campo' },

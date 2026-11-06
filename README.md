@@ -35,6 +35,15 @@ Las funciones salen de mirar en detalle cómo trabajan Kahoot y Mentimeter, y qu
 - El docente puede **sacar de la sala** a quien entre con un nombre inapropiado. Si un celu se corta, vuelve a entrar con sus puntos.
 - Exportar e importar cuestionarios como `.json`. Plantillas de escape room y set de actividades para arrancar.
 
+## Exportar a SCORM (Moodle, campus del INFD)
+
+Desde el editor, o desde la lista de cuestionarios, el botón **SCORM** descarga un `.zip` en formato SCORM 1.2. En el aula virtual se sube como **paquete SCORM**.
+
+- Cada estudiante lo resuelve solo y a su ritmo, de a una pregunta, con devolución en cada respuesta.
+- Al terminar, la plataforma recibe la **nota de 0 a 100**, el estado (*aprobado* o *desaprobado*, según la nota mínima que elijas al exportar), el tiempo usado y lo que respondió en cada pregunta.
+- Las preguntas de opinión (encuesta, escala, ranking, nube) se responden pero no cuentan para la nota. Si el cuestionario no tiene preguntas con puntaje, queda como *completado*.
+- No necesita internet ni archivos externos: el paquete trae todo adentro.
+
 ## Cómo se usa
 
 1. Entrá a la página desde la compu que va al proyector.

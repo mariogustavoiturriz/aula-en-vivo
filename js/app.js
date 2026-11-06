@@ -28,6 +28,7 @@
             h('a', { class: 'boton boton-principal', href: '#/presentar/' + c.id }, 'Presentar'),
             h('button', { class: 'boton boton-texto', type: 'button', onclick: () => { AV.almacen.duplicar(c.id); dibujarLista(); AV.aviso('Cuestionario duplicado'); } }, 'Duplicar'),
             h('button', { class: 'boton boton-texto', type: 'button', onclick: () => AV.almacen.exportar(c) }, 'Exportar'),
+            h('button', { class: 'boton boton-texto', type: 'button', title: 'Paquete SCORM 1.2 para Moodle o el campus del INFD', onclick: () => AV.scorm.exportar(c) }, 'SCORM'),
             h('button', { class: 'boton boton-texto', type: 'button', style: { color: 'var(--error)' }, onclick: () => {
               if (!confirm(`¿Borrar «${c.titulo}»? Si no lo exportaste, se pierde.`)) return;
               AV.almacen.borrar(c.id); dibujarLista();
