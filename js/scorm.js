@@ -70,8 +70,8 @@
     </organization>
   </organizations>
   <resources>
-    <resource identifier="res1" type="webcontent" adlcp:scormtype="sco" href="index.html">
-      <file href="index.html"/>
+    <resource identifier="res1" type="webcontent" adlcp:scormtype="sco" href="reproductor-scorm.html">
+      <file href="reproductor-scorm.html"/>
     </resource>
   </resources>
 </manifest>
@@ -306,7 +306,7 @@ input[type=text]{width:100%;padding:12px;font:inherit;font-size:1.2rem;border:2p
     const id = 'aula-en-vivo-' + AV.nombreArchivo(cuest.titulo) + '-' + Date.now().toString(36);
     const blob = zip([
       { nombre: 'imsmanifest.xml', contenido: manifiesto({ ...cuest, __aprobar: aprobar }, id) },
-      { nombre: 'index.html', contenido: paginaReproductor(cuest, aprobar) }
+      { nombre: 'reproductor-scorm.html', contenido: paginaReproductor(cuest, aprobar) }
     ]);
     const url = URL.createObjectURL(blob);
     const a = AV.h('a', { href: url, download: 'scorm-' + AV.nombreArchivo(cuest.titulo) + '.zip' });
