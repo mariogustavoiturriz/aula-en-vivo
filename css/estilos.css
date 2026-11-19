@@ -451,3 +451,23 @@ details.avanzado summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
 .contador-resp.al-tope { color: var(--error); }
 .aviso-llena:empty { display: none; }
 .aviso-llena { display: block; padding: 10px 14px; border-radius: var(--radio-chico); background: #FCE1DD; color: #8E2416; font-weight: 700; }
+
+/* ---------- Guía ---------- */
+.pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.paso { display: grid; grid-template-columns: 40px 1fr; gap: 14px; align-items: start; }
+.paso-num { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; background: var(--tinta); color: #fff; font-family: var(--display); font-weight: 800; }
+.paso h3 { margin: 4px 0 4px; }
+.paso p { margin: 0; }
+.problemas { margin: 0; }
+.problemas dt { font-weight: 700; margin-top: 12px; }
+.problemas dt:first-child { margin-top: 0; }
+.problemas dd { margin: 4px 0 0; color: var(--tinta-suave); }
+
+/* Encabezado: que entre en una línea también en el celu */
+.marca { white-space: nowrap; }
+.encabezado > nav.fila { flex-wrap: nowrap; gap: 2px; }
+@media (max-width: 480px) {
+  .encabezado { padding: 10px 8px 10px 12px; gap: 6px; }
+  .marca { font-size: 1.05rem; gap: 8px; }
+  .encabezado > nav .boton-texto { padding: 6px; font-size: .92rem; }
+}

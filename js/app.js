@@ -118,6 +118,51 @@
       h('a', { href: '#/acerca' }, 'Gustavo Iturriz · software libre'));
   }
 
+  function ayuda(main) {
+    document.title = 'Cómo se usa · Aula en Vivo';
+    const paso = (n, titulo, ...texto) => h('li', { class: 'paso' }, h('span', { class: 'paso-num', 'aria-hidden': 'true' }, n), h('div', null, h('h3', null, titulo), ...texto.map(t => h('p', null, t))));
+    const seccion = (id, titulo, ...hijos) => h('section', { class: 'papel', 'aria-labelledby': id }, h('h2', { id }, titulo), ...hijos);
+    main.innerHTML = '';
+    main.append(
+      AV.encabezado(),
+      h('div', { class: 'hoja pila', style: { width: 'min(760px, 100% - 32px)' } },
+        h('section', { class: 'portada', style: { paddingBottom: 0 } },
+          h('h1', null, 'Cómo se usa'),
+          h('p', null, 'Una guía corta para arrancar. Hacen falta una compu con proyector (la del docente) y un celular por estudiante o por grupo, todos con internet.')),
+        h('nav', { class: 'fila', 'aria-label': 'Partes de la guía' },
+          h('a', { class: 'boton', href: '#ayuda-docente', onclick: ir }, 'Si presentás'),
+          h('a', { class: 'boton', href: '#ayuda-estudiante', onclick: ir }, 'Si te conectás'),
+          h('a', { class: 'boton', href: '#ayuda-problemas', onclick: ir }, 'Si algo no anda')),
+
+        seccion('ayuda-docente', 'Si presentás (docente)',
+          h('ol', { class: 'pasos' },
+            paso(1, 'Armá el cuestionario', 'En el inicio tocá Nuevo cuestionario, o una plantilla de escape room o de set de actividades. Agregá preguntas con los botones de abajo y elegí cómo se juega: en vivo, escape room o set.'),
+            paso(2, 'Presentá desde la compu del proyector', 'Tocá Presentar. Esperá a que arriba a la derecha diga Sala abierta, en verde. Ahí aparecen el QR y un código de 5 letras.'),
+            paso(3, 'Elegí el límite de conexiones', 'Al lado del contador podés poner hasta cuántas personas entran. Si alguien entra con un nombre que no corresponde, tocá su nombre para sacarlo.'),
+            paso(4, 'Empezá', 'Cuando estén todos, tocá Empezar. En vivo, cada pregunta se cierra sola al terminar el tiempo o cuando respondieron todos; para seguir, tocá el botón o la flecha derecha del teclado.'),
+            paso(5, 'Guardá los resultados', 'Al final tocá Descargar resultados: baja un archivo que se abre en Excel o en Hojas de cálculo. Si cerrás la pestaña antes, los resultados se pierden.')),
+          h('p', { class: 'ayuda' }, 'Los cuestionarios quedan guardados solo en el navegador de esa compu. Usá Exportar para tener una copia o pasarlos a otra compu, e Importar para traerlos.')),
+
+        seccion('ayuda-estudiante', 'Si te conectás (estudiante)',
+          h('ol', { class: 'pasos' },
+            paso(1, 'Escaneá el QR', 'Abrí la cámara del celu y apuntá al QR del pizarrón. Si no podés, entrá a la página de Aula en Vivo, tocá Unirme a una sala y escribí el código.'),
+            paso(2, 'Poné tu nombre y armá tu avatar', 'Elegí cómo querés aparecer. Con las flechas cambiás el color, la forma, los ojos, la boca y el accesorio, o tocá Al azar.'),
+            paso(3, 'Esperá a que empiece', 'Cuando diga Ya estás en la sala, mirá el pizarrón. Mientras esperás podés mandar reacciones con los emojis.'),
+            paso(4, 'Respondé', 'Tocá la opción que te parezca. Si se pueden elegir varias, marcalas y después tocá Enviar. En las de ordenar usá las flechas, y en las de número mové el deslizador.')),
+          h('p', { class: 'ayuda' }, 'No cierres la página mientras dura la actividad. Si se te corta, volvé a entrar con el mismo celu: conservás tus puntos.')),
+
+        seccion('ayuda-problemas', 'Si algo no anda',
+          h('dl', { class: 'problemas' },
+            h('dt', null, 'El pizarrón dice Sin conexión con la red'), h('dd', null, 'Revisá que la compu tenga internet. Si la tiene, en el inicio abrí Conexión de los celulares, elegí MQTT y volvé a presentar.'),
+            h('dt', null, 'Los celus se quedan en Buscando la sala'), h('dd', null, 'Algunos wifi de escuela no dejan que los dispositivos se hablen entre sí. Probá compartiendo internet desde el celu del docente (zona wifi) y conectando ahí la compu y los celulares, o que los estudiantes usen sus datos.'),
+            h('dt', null, 'A un celu le dice La sala está llena'), h('dd', null, 'Subí el límite de conexiones en el pizarrón, o sacá a alguien que ya no esté. Después el estudiante toca Volver a intentar.'),
+            h('dt', null, 'No veo los cambios nuevos de la app'), h('dd', null, 'Recargá la página con Ctrl + Shift + R. En Acerca de figura la versión que estás usando.'),
+            h('dt', null, 'Quiero usarlo en Moodle o en el campus'), h('dd', null, 'En el editor tocá SCORM y subí el .zip entero, sin descomprimir, como paquete SCORM en el aula virtual. Ese archivo no va en ningún otro lado.'))),
+        pie())
+    );
+    function ir(e) { e.preventDefault(); const d = document.getElementById(e.currentTarget.getAttribute('href').slice(1)); if (d) { d.scrollIntoView({ behavior: 'smooth' }); d.setAttribute('tabindex', '-1'); d.focus({ preventScroll: true }); } }
+  }
+
   function acerca(main) {
     document.title = 'Acerca de · Aula en Vivo';
     const vias = h('div', { class: 'fila' });
@@ -191,6 +236,7 @@
     if (ruta === 'editar' && param) limpiar = AV.editor.render(main, param);
     else if (ruta === 'presentar' && param) limpiar = AV.docente.render(main, param);
     else if (ruta === 'acerca') acerca(main);
+    else if (ruta === 'ayuda') ayuda(main);
     else if (ruta === 'sala') limpiar = AV.estudiante.render(main, AV.limpiarCodigo(param || ''));
     else inicio(main);
   }

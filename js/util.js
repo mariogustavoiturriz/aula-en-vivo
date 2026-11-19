@@ -100,7 +100,7 @@ window.AV = window.AV || {};
     }
   };
 
-  const VERSION = '1.4.2';
+  const VERSION = '1.5.1';
 
   function encabezado(extra) {
     return h('header', { class: 'encabezado' },
@@ -108,6 +108,7 @@ window.AV = window.AV || {};
         h('span', { class: 'marca-icono', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'), h('i')),
         'Aula en Vivo'),
       extra || h('nav', { class: 'fila' },
+        h('a', { class: 'boton boton-texto', href: '#/ayuda', 'aria-current': location.hash === '#/ayuda' ? 'page' : null }, 'Cómo se usa'),
         h('a', { class: 'boton boton-texto', href: '#/acerca', 'aria-current': location.hash === '#/acerca' ? 'page' : null }, 'Acerca de')));
   }
 
