@@ -177,7 +177,7 @@
         }, 'Borrar')
       );
 
-      // puntos: normal, doble o sin puntos (como en Kahoot). Solo en preguntas con respuesta correcta
+      // puntos: normal, doble o sin puntos. Solo en preguntas con respuesta correcta
       const idPts = 'pts-' + p.id;
       const selPuntos = AV.almacen.tieneCorrecta(p) ? h('div', { class: 'fila' }, h('label', { for: idPts, style: { margin: 0 } }, 'Puntos'),
         h('select', { id: idPts, style: { width: 'auto' }, onchange: e => { const v = Number(e.target.value); if (v === 1000) delete p.puntos; else p.puntos = v; guardarYa(); } },

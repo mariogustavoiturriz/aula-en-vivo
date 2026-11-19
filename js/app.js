@@ -78,7 +78,7 @@
 
           h('section', { class: 'papel camino', 'aria-labelledby': 't-armar' },
             h('h2', { id: 't-armar' }, 'Armar un cuestionario'),
-            h('p', null, 'En vivo como Kahoot o Menti, o a su ritmo como escape room o set de actividades. Las plantillas vienen con un ejemplo para cambiar.'),
+            h('p', null, 'En vivo, todos a la vez, o a su ritmo como escape room o set de actividades. Las plantillas vienen con un ejemplo para cambiar.'),
             h('div', { class: 'fila' },
               h('button', { class: 'boton boton-principal', type: 'button', onclick: () => { const c = AV.almacen.crear(); location.hash = '#/editar/' + c.id; } }, 'Nuevo cuestionario'),
               h('button', { class: 'boton', type: 'button', onclick: () => { const c = AV.almacen.crearDesdePlantilla('escape'); location.hash = '#/editar/' + c.id; } }, '🔐 Escape room'),

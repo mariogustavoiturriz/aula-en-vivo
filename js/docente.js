@@ -251,7 +251,7 @@
         if (!ev) return;
         let puntos = 0, bonus = 0;
         if (AV.almacen.calificable(p) && ev.parte > 0) {
-          // fórmula de Kahoot: arranca en el total y baja hasta la mitad a medida que pasa el tiempo.
+          // puntaje por rapidez: arranca en el total y baja hasta la mitad a medida que pasa el tiempo.
           // En adivinar el número: 80 % precisión y 20 % rapidez
           const base = p.puntos ?? 1000;
           const rapidez = restanteMs() / duracion;
@@ -698,7 +698,7 @@
           prom !== null ? h('span', null, 'Promedio de la clase: ' + fmt(Math.round(prom * 10) / 10)) : h('span', null, 'Nadie respondió.')));
     }
 
-    // ---------- Reacciones (como en Mentimeter): emojis que suben por el proyector ----------
+    // ---------- Reacciones: emojis que suben por el proyector ----------
     const REACCIONES = ['👏', '❤️', '😂', '😮', '🤔', '🔥'];
     const capaReac = h('div', { class: 'capa-reacciones', 'aria-hidden': 'true' });
     document.body.append(capaReac);

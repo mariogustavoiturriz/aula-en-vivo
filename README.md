@@ -1,15 +1,15 @@
 # Aula en Vivo
 
-Cuestionarios con puntaje, encuestas y nubes de palabras en vivo para el aula, al estilo de Kahoot o Mentimeter, pero como software libre: sin cuentas, sin publicidad y sin que las respuestas de los estudiantes queden guardadas en servidores ajenos.
+Cuestionarios con puntaje, encuestas y nubes de palabras en vivo para el aula como software libre: sin cuentas, sin publicidad y sin que las respuestas de los estudiantes queden guardadas en servidores ajenos.
 
 Forma parte de la misma familia que *Realidad aumentada para el aula*: una página web estática que se publica en GitHub Pages, se puede descargar y no necesita instalar nada.
 
 ## Qué se puede hacer
 
-Las funciones salen de mirar en detalle cómo trabajan Kahoot y Mentimeter, y quedarse con lo que sirve en el aula.
+Las funciones se eligieron pensando en lo que sirve en el aula.
 
 **Tres formas de jugar**
-- **En vivo** (como Kahoot y Menti): todos responden la misma pregunta a la vez y el docente las pasa desde el proyector.
+- **En vivo**: todos responden la misma pregunta a la vez y el docente las pasa desde el proyector.
 - **Escape room**: cada pregunta es un candado. Hasta que no la responden bien no ven la siguiente. Avanzan a su ritmo, solos o por equipo, con tiempo total opcional. En el proyector se ve quién va abriendo cada candado.
 - **Set de actividades**: un menú con todas las actividades, que hacen en el orden que quieran. Cada una se responde una vez.
 
@@ -18,19 +18,19 @@ Las funciones salen de mirar en detalle cómo trabajan Kahoot y Mentimeter, y qu
 - **Verdadero o falso**.
 - **Respuesta escrita**: no importan mayúsculas, tildes ni espacios, y 3,5 vale igual que 3.5. Se pueden cargar varias respuestas válidas.
 - **Ordenar**: de 2 a 6 elementos que aparecen mezclados y se acomodan con flechas.
-- **Adivinar el número**: un deslizador con margen aceptado. Cuanto más cerca, más puntos (80 % precisión y 20 % rapidez, igual que el slider de Kahoot).
+- **Adivinar el número**: un deslizador con margen aceptado. Cuanto más cerca, más puntos (80 % precisión y 20 % rapidez).
 
 **Para opinar** (no suman puntos)
 - **Encuesta** de una o varias opciones, con porcentajes.
-- **Escala** (como en Menti): un deslizador con textos en los extremos; muestra cuántos eligieron cada valor y el promedio.
-- **Ranking** (como en Menti): cada uno ordena según lo que piensa y se ve el puesto promedio.
+- **Escala**: un deslizador con textos en los extremos; muestra cuántos eligieron cada valor y el promedio.
+- **Ranking**: cada uno ordena según lo que piensa y se ve el puesto promedio.
 - **Nube de palabras** en vivo, que agrupa mayúsculas y tildes.
 
 **Puntaje y juego**
-- Fórmula de Kahoot: la respuesta correcta vale 1000 si es inmediata y baja hasta 500 al final del tiempo. Cada pregunta puede valer normal, doble o sin puntos.
+- Puntaje por rapidez: la respuesta correcta vale 1000 si es inmediata y baja hasta 500 al final del tiempo. Cada pregunta puede valer normal, doble o sin puntos.
 - **Rachas**: desde la segunda correcta seguida suman 100, 200… hasta 500 extra, con el 🔥 en el celu y en las posiciones.
 - **Avatares**: cada estudiante arma su criatura por partes (color, forma, ojos, boca y accesorio) o la sortea. Aparece en la sala, en las posiciones, en el podio y en el avance de los modos a su ritmo. También hay un botón para inventar un apodo (fauna del sur: Pingüino Sabio, Carpincho Veloz…).
-- **Reacciones** (como en Menti): desde el celu se mandan 👏 ❤️ 😂 😮 🤔 🔥 que suben por el proyector con el avatar de quien las manda.
+- **Reacciones**: desde el celu se mandan 👏 ❤️ 😂 😮 🤔 🔥 que suben por el proyector con el avatar de quien las manda.
 - Posiciones entre preguntas, podio final y **descarga de resultados en CSV** (abre directo en Excel o en Hojas de cálculo).
 - **Límite de conexiones**: en la sala elegís hasta cuántas personas pueden entrar (por defecto 50, o sin límite). Si se llena, el celu que llega ve un aviso y en el proyector se cuenta cuántos quedaron afuera. Quien ya estaba y se le cortó siempre puede volver.
 - El docente puede **sacar de la sala** a quien entre con un nombre inapropiado. Si un celu se corta, vuelve a entrar con sus puntos.
@@ -56,7 +56,7 @@ Los cuestionarios quedan guardados en el navegador de esa compu. Para pasarlos a
 
 ## Cómo funciona la conexión
 
-Kahoot y Menti necesitan un servidor central donde se juntan todas las respuestas. Acá no:
+Las herramientas comerciales de este tipo necesitan un servidor central donde se juntan todas las respuestas. Acá no:
 
 - Cada celular se conecta **directo** al navegador del docente con WebRTC, y el tráfico va cifrado de punta a punta.
 - Para que el celu y la compu se encuentren hace falta un "apretón de manos" inicial. Eso lo resuelve la librería libre [Trystero](https://github.com/dmotz/trystero) usando redes públicas y descentralizadas que ya existen. Por esas redes no pasan las respuestas, solo los datos para encontrarse.
