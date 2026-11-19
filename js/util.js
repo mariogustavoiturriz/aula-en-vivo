@@ -100,7 +100,7 @@ window.AV = window.AV || {};
     }
   };
 
-  const VERSION = '1.3';
+  const VERSION = '1.4';
 
   function encabezado(extra) {
     return h('header', { class: 'encabezado' },

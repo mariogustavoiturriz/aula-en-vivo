@@ -446,3 +446,8 @@ details.avanzado summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
 .hist-cant { font-family: var(--display); font-weight: 800; font-size: 1.3rem; }
 .hist-etq { font-weight: 700; color: var(--tinta-suave); font-size: .95rem; }
 .resumen-num { display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; font-size: clamp(1.1rem, 2vw, 1.6rem); margin: 8px 0 0; }
+
+/* ---------- Límite de conexiones ---------- */
+.contador-resp.al-tope { color: var(--error); }
+.aviso-llena:empty { display: none; }
+.aviso-llena { display: block; padding: 10px 14px; border-radius: var(--radio-chico); background: #FCE1DD; color: #8E2416; font-weight: 700; }

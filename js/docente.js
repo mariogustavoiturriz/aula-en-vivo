@@ -30,6 +30,13 @@
     const jugadores = new Map();      // idCliente -> {id, nombre, puntos, peerId, conectado, resp: []}
     const peerAJugador = new Map();   // peerId -> idCliente
     const expulsados = new Set();
+    // límite de participantes (0 = sin límite). Se recuerda para la próxima clase
+    let limite = Number(AV.guardado.leer('aulaenvivo.limite', 50)) || 0;
+    let rechazados = 0;
+    function avisoLlena() {
+      rechazados++;
+      if (ref.llena) ref.llena.textContent = `La sala está llena: ${rechazados === 1 ? '1 persona no pudo entrar' : rechazados + ' personas no pudieron entrar'}. Subí el límite o sacá a alguien para liberar lugar.`;
+    }
     let conexion = null;
     let fase = 'sala';
     let n = -1;
@@ -218,6 +225,8 @@
         if (!idCliente) return;
         if (expulsados.has(idCliente)) { conexion.enviar({ t: 'fuera' }, peerId); return; }
         let j = jugadores.get(idCliente);
+        // límite de participantes: quien ya estaba (por ejemplo, se le cortó) siempre puede volver
+        if (!j && limite && jugadores.size >= limite) { conexion.enviar({ t: 'llena', limite }, peerId); avisoLlena(); return; }
         if (!j) {
           j = { id: idCliente, nombre: nombreUnico(String(datos.nombre || ''), idCliente), puntos: 0, racha: 0, resp: [] };
           jugadores.set(idCliente, j);
@@ -407,6 +416,11 @@
         codigo.split('').map(c => h('span', { 'aria-hidden': 'true' }, c)));
       ref.chips = h('div', { class: 'participantes', 'aria-live': 'polite' });
       ref.cuenta = h('span', { class: 'contador-resp' }, '0 personas');
+      ref.llena = h('span', { class: 'aviso-llena', role: 'status' });
+      const selLimite = h('select', { id: 'limite', style: { width: 'auto' }, onchange: e => {
+        limite = Number(e.target.value); AV.guardado.escribir('aulaenvivo.limite', limite); ref.llena.textContent = ''; actualizarParticipantes();
+      } }, [0, 10, 20, 30, 40, 50, 60, 80, 100].map(v => h('option', { value: v, selected: v === limite }, v ? `${v} personas` : 'Sin límite')));
+      ref.limite = h('div', { class: 'fila' }, h('label', { for: 'limite', style: { margin: 0 } }, 'Límite de conexiones'), selLimite);
       ref.empezar = h('button', { class: 'boton boton-principal boton-grande', type: 'button', disabled: true, onclick: () => siguiente() }, 'Empezar');
       const qr = enlace
         ? h('div', { class: 'qr', html: AV.qrSVG(enlace), role: 'img', 'aria-label': 'Código QR para entrar a la sala' })
@@ -428,7 +442,9 @@
               : h('p', null, 'Escaneá el QR con la cámara del celu. El código de la sala es:'),
             codigoGrande),
           qr),
-        h('div', { class: 'fila-entre' }, ref.cuenta, h('span', { class: 'suave chico' }, 'Tocá un nombre para sacarlo de la sala.')),
+        h('div', { class: 'fila-entre' }, ref.cuenta, ref.limite),
+        ref.llena,
+        h('span', { class: 'suave chico' }, 'Tocá un nombre para sacarlo de la sala y liberar su lugar.'),
         ref.chips,
         h('div', { class: 'controles-proy' },
           enlace ? h('button', { class: 'boton', type: 'button', onclick: () => {
@@ -453,7 +469,8 @@
         }
       }, AV.avatar.nodo(j.avatar, 34), j.nombre)));
       const c = conectados().length;
-      ref.cuenta.textContent = c === 1 ? '1 persona conectada' : `${c} personas conectadas`;
+      ref.cuenta.textContent = (c === 1 ? '1 persona conectada' : `${c} personas conectadas`) + (limite ? ` de ${limite}` : '');
+      ref.cuenta.classList.toggle('al-tope', !!limite && jugadores.size >= limite);
       ref.empezar.disabled = jugadores.size === 0;
     }
 

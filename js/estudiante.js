@@ -117,6 +117,8 @@
       });
       conexion.alRecibir((datos, peerId) => {
         if (peerId !== docente || !datos) return;
+        if (datos.t === 'llena') { conexion.salir(); conexion = null; claveEscena = 'llena'; mensaje('La sala está llena', `Ya entraron ${datos.limite} personas, que es el límite que puso tu docente. Avisale para que te haga lugar.`,
+          h('button', { class: 'boton', type: 'button', onclick: () => pantallaEntrada() }, 'Volver a intentar')); return; }
         if (datos.t === 'fuera') { conexion.salir(); conexion = null; claveEscena = 'fuera'; mensaje('Saliste de la sala', 'Tu docente te sacó de esta sala.'); return; }
         if (datos.t === 'estado') mostrar(datos);
       });

@@ -32,6 +32,7 @@ Las funciones salen de mirar en detalle cómo trabajan Kahoot y Mentimeter, y qu
 - **Avatares**: cada estudiante arma su criatura por partes (color, forma, ojos, boca y accesorio) o la sortea. Aparece en la sala, en las posiciones, en el podio y en el avance de los modos a su ritmo. También hay un botón para inventar un apodo (fauna del sur: Pingüino Sabio, Carpincho Veloz…).
 - **Reacciones** (como en Menti): desde el celu se mandan 👏 ❤️ 😂 😮 🤔 🔥 que suben por el proyector con el avatar de quien las manda.
 - Posiciones entre preguntas, podio final y **descarga de resultados en CSV** (abre directo en Excel o en Hojas de cálculo).
+- **Límite de conexiones**: en la sala elegís hasta cuántas personas pueden entrar (por defecto 50, o sin límite). Si se llena, el celu que llega ve un aviso y en el proyector se cuenta cuántos quedaron afuera. Quien ya estaba y se le cortó siempre puede volver.
 - El docente puede **sacar de la sala** a quien entre con un nombre inapropiado. Si un celu se corta, vuelve a entrar con sus puntos.
 - Exportar e importar cuestionarios como `.json`. Plantillas de escape room y set de actividades para arrancar.
 
